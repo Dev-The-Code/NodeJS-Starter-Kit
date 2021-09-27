@@ -1,0 +1,38 @@
+{
+  "name": "stater-kit",
+  "version": "1.0.0",
+  "description": "This is the node js stater kit this will be use for any new project server start to develop",
+  "main": "server.js",
+  "scripts": {
+    "server": "nodemon server.js",
+    "start": "node server.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Concept-Recall",
+  "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/DevAwais/NodeJS-Starter-Kit.git"
+  },
+  "bugs": {
+    "url": "https://github.com/DevAwais/NodeJS-Starter-Kit/issues"
+  },
+  "homepage": "https://github.com/DevAwais/NodeJS-Starter-Kit#readme",
+  "dependencies": {
+    "body-parser": "^1.19.0",
+    "cookie-parser": "^1.4.5",
+    "cors": "^2.8.5",
+    "dotenv": "^10.0.0",
+    "express": "^4.17.1",
+    "express-validator": "^6.12.1",
+    "mongoose": "^6.0.7",
+    "morgan": "^1.10.0",
+    "path": "^0.12.7",
+    "swagger-ui-express": "^4.1.6",
+    "underscore": "^1.13.1",
+    "yamljs": "^0.3.0"
+  },
+  "devDependencies": {
+    "eslint": "^7.32.0"
+  }
+}
