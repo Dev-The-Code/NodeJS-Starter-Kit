@@ -10,7 +10,7 @@ router.get("/hello", (req, res) => {
 });
 
 // User login/register/Create Profile
-router.use("/v1/user", require("./v1/userRoutes"));
+// router.use("/v1/user", require("./v1/userRoutes"));
 
 // Uploads files
 router.use("/v1", require("./v1/uploadFile"));

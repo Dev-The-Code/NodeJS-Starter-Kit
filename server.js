@@ -39,9 +39,10 @@ app.use(function (req, res, next) {
 // Body/cookie Parsing
 app.use(bodyParser.json()); // handle json data
 app.use(cookieParser());
+app.use(bodyParser.urlencoded({ extended: true }));
 
 app.use(logger('dev'));
-app.use(express.urlencoded({ extended: false }));
+app.use(express.urlencoded({ extended: true }));
 app.set("views", path.join(__dirname, "views"));
 app.set("view engine", "ejs");
 
@@ -49,7 +50,7 @@ app.get('/', (req, res) => res.status(200).end())
 app.get('/favicon.ico', (req, res) => res.status(204).end());
 
 // Mounting Up The Routes
-app.use("/api", require("./router/index"));
+app.use("/api", require("./api/routes/index"));
 
 // No Path Found Middleware
 app.use(("*", (req, _, next) => {

@@ -24,7 +24,7 @@ const userSchema = mongoose.Schema({
         require: true
     },
     dob: {
-        type: date,
+        type: Date,
         require: true
     },
     profile:{
