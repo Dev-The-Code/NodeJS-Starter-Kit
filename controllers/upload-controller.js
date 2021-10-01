@@ -5,7 +5,6 @@ const Uploads = require('../models/UploadsModel')
 // @Desc Upload File
 exports.uploadFile = async (req, res, next) => {
   try {
-    console.log(req.file);
     let upload = new Uploads({
       ...req.file
     });

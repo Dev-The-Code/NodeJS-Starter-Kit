@@ -1,12 +1,14 @@
 const express = require("express");
-const app = express();
+const { app } = require("./config/mongoose");
 const cors = require("cors");
 const path = require("path");
-const bodyParser = require("body-parser");
-const cookieParser = require("cookie-parser");
 const logger = require('morgan');
+const passport = require("passport");
 const swaggerUI = require("swagger-ui-express");
 const YAML = require("yamljs");
+
+// Paasport config
+require('./config/passport')(passport)
 
 const port = process.env.NODE_ENV || 5000;
 
@@ -21,7 +23,7 @@ const corsOptions = {
 
 // configure
 app.use(express.json({ limit: '25mb' }));
-app.use(express.urlencoded({limit: '25mb'}));
+app.use(express.urlencoded({ limit: '25mb' }));
 app.use(cors(corsOptions));
 
 // Header 
@@ -36,16 +38,29 @@ app.use(function (req, res, next) {
     next();
 });
 
-// Body/cookie Parsing
-app.use(bodyParser.json()); // handle json data
-app.use(cookieParser());
-app.use(bodyParser.urlencoded({ extended: true }));
+// BodyParser
+app.use(express.urlencoded({ extended: false }));
 
+// Logger
 app.use(logger('dev'));
-app.use(express.urlencoded({ extended: true }));
+
+// Express Session
+app.use(session({
+    secret: 'secret',
+    resave: true,
+    saveUninitialized: true,
+}))
+
+// EJS
+app.use(expressLayout);
 app.set("views", path.join(__dirname, "views"));
 app.set("view engine", "ejs");
 
+// Passport middleware
+app.use(passport.initialize());
+app.use(passport.session());
+
+// Routes
 app.get('/', (req, res) => res.status(200).end())
 app.get('/favicon.ico', (req, res) => res.status(204).end());
 
