@@ -1,14 +1,14 @@
 const express = require("express");
 const { Protected } = require("../../../services/jwt");
 const uploadController = require("../../../controllers/upload-controller");
-// const { fileUpload } = require("../../middlewares/file-upload");
-const router = express.Router();
+const { fileUpload } = require("../../middlewares/file-upload");
+const Router = express.Router();
 
 // Protected Routes
-router.use(Protected);
-// router.route("/upload").post(
-//   fileUpload.single("file"),
-//   uploadController.uploadFile
-// );
+Router.use(Protected);
+Router.route("/upload").post(
+    fileUpload.single("file"),
+    uploadController.uploadFiles
+);
 
-module.exports = router;
+module.exports = Router;

@@ -4,14 +4,15 @@ const cors = require("cors");
 const path = require("path");
 const logger = require('morgan');
 const passport = require("passport");
+const expressLayout = require("express-ejs-layouts")
+const session = require("express-session")
 const swaggerUI = require("swagger-ui-express");
 const YAML = require("yamljs");
 
 // Paasport config
 require('./config/passport')(passport)
 
-const port = process.env.NODE_ENV || 5000;
-
+const port = process.env.NODE_ENV || 4000;
 
 // Cors Option
 const corsOptions = {
@@ -23,11 +24,9 @@ const corsOptions = {
 
 // configure
 app.use(express.json({ limit: '25mb' }));
-app.use(express.urlencoded({ limit: '25mb' }));
 app.use(cors(corsOptions));
 
-// Header 
-//app use
+// Header
 app.use(function (req, res, next) {
     res.header("Access-Control-Allow-Origin", "*");
     res.header("Access-Control-Allow-Credentials", "true");
@@ -39,7 +38,8 @@ app.use(function (req, res, next) {
 });
 
 // BodyParser
-app.use(express.urlencoded({ extended: false }));
+// app.use(express.urlencoded({ extended: false }));
+app.use(express.urlencoded({ extended: false, limit: '25mb' }));
 
 // Logger
 app.use(logger('dev'));
@@ -70,12 +70,12 @@ app.use("/api", require("./api/routes/index"));
 // No Path Found Middleware
 app.use(("*", (req, _, next) => {
     return next({
-        error: `Unable To Find Path ${req.protocol}://${req.url}`,
+        error: `Unable To Find Path ${req.protocol}://${req.url}, Kinly review it your path`,
         statusCode: 404
     })
 }));
 
 app.listen(port, (err) => {
-    if (err) return console.log("Unable To Start Server :(");
+    if (err) return console.log("Unable To Start Server");
     console.log(`Server Is Running On Port ${port}`);
 })
