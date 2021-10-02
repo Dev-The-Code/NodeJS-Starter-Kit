@@ -9,10 +9,16 @@ router.get("/hello", (req, res) => {
   res.send({ express: "Hello From Express" });
 });
 
-// User login/register/Create Profile
+// Buyer API's
 router.use("/v1/user", require("./v1/user"));
 
-// Uploads files
+// Seller API's
+router.use("/v1/user", require("./v1/user"));
+
+// Admin API's
+router.use("/v1/user", require("./v1/user"));
+
+// Upload files
 // router.use("/v1", require("./v1/uploadFile"));
 
 module.exports = router;

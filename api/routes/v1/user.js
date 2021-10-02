@@ -3,7 +3,6 @@ const router = express.Router();
 const userController = require("../../../controllers/user-controller");
 const {
     signUpValidations,
-    sellerSignUpValidations,
     loginValidations,
     forgotPasswordValidation,
     resetPasswordValidation,
@@ -27,22 +26,25 @@ const { ensureAuthenticated } = require('../../../config/auth');
 //     res.redirect("/users/login")
 // })
 
-
+// Individual user Sign UP
 router.route("/signup").post(signUpValidations, userController.signUp);
 
-router.route("/signup/seller").post(
-    sellerSignUpValidations,
-    userController.signUpSeller
-);
+// Corporate user Sign UP
 router.route("/signup/corporate").post(
     corporateSignupValidations,
     userController.signUpCorporate
 );
+
+// User Login
 router.route("/login", ensureAuthenticated).post(loginValidations, userController.logIn);
+
+// User Forget Password
 router.route("/forgetPassword").post(
     forgotPasswordValidation,
     userController.forgotPassword
 );
+
+// Reset Password
 router.route("/resetPassword/:token").post(
     resetPasswordValidation,
     userController.resetPassword
