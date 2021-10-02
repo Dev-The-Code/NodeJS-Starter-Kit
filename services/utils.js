@@ -1,6 +1,6 @@
 const { validationResult } = require("express-validator");
-const fs = require("fs");
 const bcrypt = require("bcryptjs");
+const fs = require("fs");
 
 exports.checkValidation = (req) => {
   let errObj = {};
@@ -38,19 +38,6 @@ exports.returnImageArr = (req) =>
     filename: imageFile.filename,
     path: imageFile.path,
   }));
-
-exports.generateUniqueId = (lastGeneratedId) => {
-  let newGeneratedId;
-  if (!lastGeneratedId) {
-    newGeneratedId = "0000";
-  } else {
-    let newId = lastGeneratedId * 1 + 1;
-    let slicedId = "0000".slice(newId.toString().length, 4);
-    newGeneratedId = slicedId.concat(newId);
-  }
-  return newGeneratedId;
-};
-
 
 exports.generateHashedPassword = async (password) => {
   const salt = await bcrypt.genSalt(10);

@@ -13,9 +13,9 @@ const uploadsSchema = mongoose.Schema({
         type: String,
         require: true
     },
-    user: {
-        type: mongoose.Types.ObjectId,
-        ref: "users"
+    profileId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "profile"
     },
 }, { timestamps: true });
 

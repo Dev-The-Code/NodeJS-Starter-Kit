@@ -22,11 +22,11 @@ const profileSchema = mongoose.Schema({
         require: true
     },
     profilepicture: {
-        type: mongoose.Types.ObjectId,
+       type: mongoose.Schema.Types.ObjectId,
         ref: "uploads"
     },
-    user: {
-        type: mongoose.Types.ObjectId,
+    storeId: {
+       type: mongoose.Schema.Types.ObjectId,
         ref: "users"
     },
 }, { timestamps: true });

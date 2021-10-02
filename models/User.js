@@ -27,29 +27,21 @@ const UserSchema = mongoose.Schema({
         type: Date,
         require: true
     },
-    profile: {
-        type: mongoose.Types.ObjectId,
+    profileId: {
+        type: mongoose.Schema.Types.ObjectId,
         ref: "profile"
     },
     resetPasswordToken: {
         type: String,
         default: null
     },
-    resetPasswordTokenDuration: {
-        type: Date,
-        default: null
-    },
     otp: {
         type: String,
         default: null
     },
-    otpDuration: {
-        type: Date,
-        default: null
-    },
     role: {
         type: String,
-        default: "user"
+        default: "buyer"
     },
     verified: {
         type: Boolean,
@@ -72,7 +64,7 @@ UserSchema.pre('save', function save(next) {
     });
 });
 
-UserSchema.methods.verifyPassword = async (raw, hashed) => await console.log('function called');
+UserSchema.methods.verifyPassword = async (raw, hashed) => await bcrypt.compare(raw, hashed);
 
 UserSchema.statics.GenerateToken = (id, role) => (jwt.sign({ id, role }, process.env.SECRET_KEY));
 

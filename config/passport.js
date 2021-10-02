@@ -2,8 +2,7 @@ const LocalStartegy = require("passport-local");
 const mongoose = require("mongoose");
 const bcrypt = require("bcryptjs");
 
-// Load Use Model
-
+// Load User Model
 const User = require('../models/User');
 
 module.exports = function (passport) {

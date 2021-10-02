@@ -1,4 +1,4 @@
-const UserModel = require("../models/UserModel");
+const User = require("../models/User");
 const jwt = require("jsonwebtoken");
 
 exports.Protected = async (req, res, next) => {
@@ -9,30 +9,35 @@ exports.Protected = async (req, res, next) => {
       req.headers.authorization.startsWith("Bearer")
     ) {
       token = req.headers.authorization.split(" ")[1];
-      const decode = jwt.verify(token, process.env.SECRET_KEY);
+      const decode = jwt.verify(token, process.env.SECRET_KEY, {
+        ignoreExpiration: true,
+      });
       // jwt.decode(token);
       if (!decode) {
         return next({
           error: "You Are Not Authnticated.Please Login First",
-          statusCode: 401
+          statusCode: 401,
         });
       }
-      const user = await UserModel.findById(decode.id);
+      const user = await User.findById(decode.id);
       if (!user) {
-        return next({ error: "You Are Not Authnticated.", statusCode: 401 });
+        return next({
+          error: "You Are Not Authnticated.Please Login First",
+          statusCode: 401,
+        });
       }
       req.user = user;
       next();
     } else {
       return next({
-        error: "You Are Not Authnticated.",
-        statusCode: 401
+        error: "You Are Not Authnticated.Please Login First",
+        statusCode: 401,
       });
     }
   } catch (error) {
     next({
       error: error.message,
-      statusCode: 400
-    })
+      statusCode: 400,
+    });
   }
 };

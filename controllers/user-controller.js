@@ -1,6 +1,5 @@
 const User = require("../models/User");
-const storeModel = require("../models/StoreModel");
-const passport = require("passport");
+const Store = require("../models/Store");
 const {
   checkValidation,
   generateHashedPassword,
@@ -10,7 +9,7 @@ const moment = require("moment");
 
 // @Route http://localhost:5000/api/v1/user/signUp/
 // @Method POST
-// @Desc Add new buyer-
+// @Desc Add new buyer
 exports.signUp = async (req, res, next) => {
   try {
     let { firstName, lastName, email, password } = req.body;
@@ -28,21 +27,19 @@ exports.signUp = async (req, res, next) => {
         statusCode: 403,
       });
     } else {
-      // Generate HashPassword;
-      let hashedPassword = await generateHashedPassword(password);
       // Creating User
       let newUser = new User({
         firstName,
         lastName,
         email,
-        password: hashedPassword,
-        role: "buyer",
+        password,
       });
 
       await newUser.save();
       res.status(200).json({ success: true });
     }
   } catch (error) {
+    console.log(error, 'error')
     next({
       error,
       statusCode: 500,
@@ -71,7 +68,7 @@ exports.signUpSeller = async (req, res, next) => {
       });
     } else {
       // Checking whether any other user exists with the same phone number
-      let existingStore = await storeModel.findOne({
+      let existingStore = await Store.findOne({
         storeName,
       });
       if (existingStore) {
@@ -81,17 +78,16 @@ exports.signUpSeller = async (req, res, next) => {
         });
       } else {
         //   Creating New Company
-        let corporateStore = new storeModel({
+        let corporateStore = new Store({
           storeName,
         });
-        // Generate HashPassword;
-        let hashedPassword = await generateHashedPassword(password);
+
         // Creating User
         let newUser = new User({
           firstName,
           lastName,
           email,
-          password: hashedPassword,
+          password,
           companyId: corporateStore._id,
           companyName: req.body.companyName,
           role: "seller",
@@ -138,7 +134,7 @@ exports.signUpCorporate = async (req, res, next) => {
       });
     } else {
       // Checking whether any other user exists with the same phone number
-      let existingStore = await storeModel.findOne({
+      let existingStore = await Store.findOne({
         storeName,
       });
       if (existingStore) {
@@ -148,7 +144,7 @@ exports.signUpCorporate = async (req, res, next) => {
         });
       } else {
         //   Creating New Company
-        let corporateStore = new storeModel({
+        let corporateStore = new Store({
           storeName,
           storeBased,
           deliveryAddress,
@@ -157,15 +153,13 @@ exports.signUpCorporate = async (req, res, next) => {
           ntn,
         });
 
-        // Generate HashPassword;
-        let hashedPassword = await generateHashedPassword(password);
         // Creating User
         let newUser = new User({
           fullName,
           email,
           storeId: corporateStore._id,
           storeName: req.body.storeName,
-          password: hashedPassword,
+          password,
           role: "buyer",
         });
 
@@ -187,58 +181,43 @@ exports.signUpCorporate = async (req, res, next) => {
 // @Method POST
 // @Desc Login User
 exports.logIn = async (req, res, next) => {
-
   try {
     let errors = checkValidation(req);
     if (errors) {
       return next(errors);
     }
-    
-
     const isUserExists = await User.findOne({
       email: req.body.email,
     });
-   
+
+    console.log(req.body.email, 'req.body.email');
+
+
     if (!isUserExists) {
       return next({
         error: "Invalid email or password",
         statusCode: 400,
       });
     }
-   
     const isCorrectPassword = await isUserExists.verifyPassword(
       req.body.password,
       isUserExists.password
     );
-    
-  //   if (!isCorrectPassword) {
-  //     return next({
-  //       error: "Invalid email or password",
-  //       statusCode: 400,
-  //     });
-  //   }
-  //   console.log(isCorrectPassword, 'sign in hit');
-  //   res.status(200).json({
-  //    success: true
-  //  });
-    // const token = User.GenerateToken(isUserExists._id);
+    console.log(isCorrectPassword, 'isCorrectPassword');
+    if (!isCorrectPassword) {
+      return next({
+        error: "Invalid email or password",
+        statusCode: 400,
+      });
+    }
 
-    // //   passport.authenticate('local', {
-    // //     successRedirect: '/dashboard',
-    // //     failureRedirect: '/users/login',
-    // //     failureFlash: true
-    // // })(req, res, next);
-    // res.status(200).json({
-    //   token,
-    //   user: isUserExists,
-    // });
-
-    // passport.authenticate('local', { failureRedirect: '/login' }),
-    //   function (req, res) {
-    //   }
-
+    const token = User.GenerateToken(isUserExists._id);
+    res.status(200).json({
+      token,
+      user: isUserExists,
+    });
   } catch (error) {
-    console.log(error, 'error');
+    console.log(error);
     next({
       error,
       statusCode: 500,
