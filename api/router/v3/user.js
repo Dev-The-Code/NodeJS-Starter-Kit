@@ -7,6 +7,6 @@ const {
 const { ensureAuthenticated } = require('../../../config/auth');
 
 // Admin Login
-router.route("/login", ensureAuthenticated).post(loginValidations, userController.logIn);
+router.route("/login", ensureAuthenticated).post(loginValidations, userController.login);
 
 module.exports = router;

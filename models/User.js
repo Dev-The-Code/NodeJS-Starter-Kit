@@ -19,17 +19,13 @@ const UserSchema = mongoose.Schema({
         type: String,
         require: true
     },
-    phoneNumber: {
+    role: {
         type: String,
-        require: true
+        default: "buyer"
     },
-    dob: {
-        type: Date,
-        require: true
-    },
-    profileId: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "profile"
+    roleType: {
+        type: String,
+        default: "individual"
     },
     resetPasswordToken: {
         type: String,
@@ -38,10 +34,6 @@ const UserSchema = mongoose.Schema({
     otp: {
         type: String,
         default: null
-    },
-    role: {
-        type: String,
-        default: "buyer"
     },
     verified: {
         type: Boolean,

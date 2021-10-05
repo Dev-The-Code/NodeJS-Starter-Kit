@@ -1,15 +1,52 @@
 const { check } = require("express-validator");
 
-exports.signUpValidations = [
+exports.buyerSignUpValidations = [
   check("firstName").notEmpty().withMessage("Please provide firstName"),
   check("lastName").notEmpty().withMessage("Please provide lastName"),
   check("email").isEmail().withMessage("Please provide valid email"),
   check("password")
-    .isLength({ min: 8 })
-    .withMessage("Password must be atleast 8 characters long"),
-  check("confirmPassword")
-    .isLength({ min: 8 })
-    .withMessage("Password must be atleast 8 characters long")
+    .trim()
+    .isLength({ min: 6, max: 16 })
+    .withMessage("Password must be between 4 to 16 charcters").custom(async (confirmPassword, { req }) => {
+      const password = req.body.password
+
+      // If password and confirm password not same
+      // don't allow to sign up and throw error
+      if (password !== confirmPassword) {
+        throw new Error('Passwords must be same')
+      }
+    }),
+];
+
+
+exports.corporateSignupValidations = [
+  check("firstName").notEmpty().withMessage("Please provide firstName"),
+  check("lastName").notEmpty().withMessage("Please provide lastName"),
+  check("companyName").notEmpty().withMessage("Please provide store name"),
+  check("companyBased").notEmpty().withMessage("Please provide store based"),
+  check("deliveryAddress")
+    .notEmpty()
+    .withMessage("Please provide delivery address"),
+  check("companyRegistered")
+    .notEmpty()
+    .withMessage("Please provide store registered"),
+  check("phoneNumber")
+    .notEmpty()
+    .withMessage("Please provide phone number"),
+  check("ntn").notEmpty().withMessage("Please provide ntn"),
+  check("email").isEmail().withMessage("Please provide valid email"),
+  check("password")
+    .trim()
+    .isLength({ min: 6, max: 16 })
+    .withMessage("Password must be between 4 to 16 charcters").custom(async (confirmPassword, { req }) => {
+      const password = req.body.password
+
+      // If password and confirm password not same
+      // don't allow to sign up and throw error
+      if (password !== confirmPassword) {
+        throw new Error('Passwords must be same')
+      }
+    }),
 ];
 
 exports.sellerSignUpValidations = [
@@ -18,34 +55,17 @@ exports.sellerSignUpValidations = [
   check("storeName").notEmpty().withMessage("Please provide store name"),
   check("email").isEmail().withMessage("Please provide valid email"),
   check("password")
-    .isLength({ min: 8 })
-    .withMessage("Password must be atleast 8 characters long"),
-  check("confirmPassword")
-    .isLength({ min: 8 })
-    .withMessage("Password must be atleast 8 characters long")
-];
+    .trim()
+    .isLength({ min: 6, max: 16 })
+    .withMessage("Password must be between 4 to 16 charcters").custom(async (confirmPassword, { req }) => {
+      const password = req.body.password
 
-exports.corporateSignupValidations = [
-  check("fullName").notEmpty().withMessage("Please provide person name"),
-  check("storeName").notEmpty().withMessage("Please provide store name"),
-  check("storeBased").notEmpty().withMessage("Please provide store based"),
-  check("deliveryAddress")
-    .notEmpty()
-    .withMessage("Please provide delivery address"),
-  check("storeRegistered")
-    .notEmpty()
-    .withMessage("Please provide store registered"),
-  check("contactNumber")
-    .notEmpty()
-    .withMessage("Please provide contact number"),
-  check("ntn").notEmpty().withMessage("Please provide ntn"),
-  check("email").isEmail().withMessage("Please provide valid email"),
-  check("password")
-    .isLength({ min: 8 })
-    .withMessage("Password must be atleast 8 characters long"),
-  check("confirmPassword")
-    .isLength({ min: 8 })
-    .withMessage("Password must be atleast 8 characters long")
+      // If password and confirm password not same
+      // don't allow to sign up and throw error
+      if (password !== confirmPassword) {
+        throw new Error('Passwords must be same')
+      }
+    }),
 ];
 
 exports.loginValidations = [
@@ -61,9 +81,15 @@ exports.forgotPasswordValidation = [
 
 exports.resetPasswordValidation = [
   check("newPassword")
-    .isLength({ min: 8 })
-    .withMessage("Password must be  atleast 8 characters long"),
-  check("confirmPassword")
-    .isLength({ min: 8 })
-    .withMessage("Newpassword must be  atleast 8 characters long"),
+    .trim()
+    .isLength({ min: 6, max: 16 })
+    .withMessage("Password must be between 4 to 16 charcters").custom(async (confirmPassword, { req }) => {
+      const newPassword = req.body.newPassword
+
+      // If newPassword and confirm newPassword not same
+      // don't allow to sign up and throw error
+      if (newPassword !== confirmPassword) {
+        throw new Error('Passwords must be same')
+      }
+    }),
 ];

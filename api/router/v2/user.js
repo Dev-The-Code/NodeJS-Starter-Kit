@@ -9,14 +9,16 @@ const {
 } = require("../../../validations/user-validation");
 const { ensureAuthenticated } = require('../../../config/auth');
 
-// Seller User Sign UP
+// Vendor Sign UP
 router.route("/signup/seller").post(
     sellerSignUpValidations,
     userController.signUpSeller
 );
 
 // User Login
-router.route("/login", ensureAuthenticated).post(loginValidations, userController.logIn);
+router.route("/login", ensureAuthenticated).post(
+    loginValidations, userController.login
+);
 
 // User Forget Password
 router.route("/forgetPassword").post(

@@ -1,11 +1,11 @@
-const transporter = require("../config/mail");
+const { transport } = require("../config/mail");
 require("dotenv").config();
 
 const useremail = process.env.email;
 const FRONT_END_URL = process.env.FRONT_END_URL;
 
 module.exports = async function main(data) {
-  let html_new_data=`
+  let html_new_data = `
   <div
   style="
     background: #f4f6fe;
@@ -64,7 +64,7 @@ module.exports = async function main(data) {
 </div>`
 
   // send mail with defined transport object
-  let info = await transporter.sendMail({
+  let info = await transport().sendMail({
     from: "<" + useremail + ">", // sender address
     to: data.email, // list of receivers
     subject: "Email Verification for PalletPal", // Subject line

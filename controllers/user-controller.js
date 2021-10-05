@@ -1,32 +1,37 @@
 const User = require("../models/User");
-const Store = require("../models/Store");
+const Profile = require("../models/Profile");
+const Store = require("../models/VendorStore");
+const Company = require('../models/CoprateCompany');
 const {
   checkValidation,
   generateHashedPassword,
 } = require("../services/utils");
-// const forgotaPasswordMail = require("../mailer/forgotPasswordMailer");
+const forgotaPasswordMail = require("../mailer/mailer");
 const moment = require("moment");
 
-// @Route http://localhost:5000/api/v1/user/signUp/
+// @Route http://localhost:4000/api/v1/user/signUp/
 // @Method POST
-// @Desc Add new buyer
-exports.signUp = async (req, res, next) => {
+// @Desc Add new buyer of Individual User
+exports.buyerSignUp = async (req, res, next) => {
   try {
     let { firstName, lastName, email, password } = req.body;
+
     // Checking Validation-
     let errors = checkValidation(req);
     if (errors) {
       return next(errors);
     }
-    // Cheking for user if user already exists with email-
+
+    // Cheking for user if user already exists with email
     const isUser = await User.findOne({ email });
     if (isUser) {
       return next({
         error:
-          "This email is already being used please use a different email address",
+          "This email is already registered, please use a different email.",
         statusCode: 403,
       });
     } else {
+
       // Creating User
       let newUser = new User({
         firstName,
@@ -35,11 +40,25 @@ exports.signUp = async (req, res, next) => {
         password,
       });
 
+      // Creating User Profile
+      let profile = new Profile({
+        firstName,
+        lastName,
+        email,
+        password,
+        userId: newUser._id
+      })
+
+      // Save data in Collections
+      await profile.save();
       await newUser.save();
-      res.status(200).json({ success: true });
+
+      res.status(200).json({
+        success: true,
+        msg: "You have been register successfully."
+      });
     }
   } catch (error) {
-    console.log(error, 'error')
     next({
       error,
       statusCode: 500,
@@ -47,40 +66,50 @@ exports.signUp = async (req, res, next) => {
   }
 };
 
-// @Route http://localhost:5000/api/v1/user/signUp/seller
+// @Route http://localhost:4000/api/v1/user/signUp/corporate
 // @Method POST
-// @Desc Add new seller-
-exports.signUpSeller = async (req, res, next) => {
+// @Desc Add new buyer of Individual User
+exports.signUpCorporate = async (req, res, next) => {
   try {
-    let { firstName, lastName, email, password, storeName } = req.body;
+    let {
+      firstName,
+      lastName,
+      companyName,
+      companyBased,
+      deliveryAddress,
+      companyRegistered,
+      phoneNumber,
+      ntn,
+      email,
+      password,
+    } = req.body;
+
     // Checking Validation-
     let errors = checkValidation(req);
     if (errors) {
       return next(errors);
     }
+
     // Cheking for user if user already exists with email-
     const isUser = await User.findOne({ email });
     if (isUser) {
       return next({
         error:
-          "This email is already being used please use a different email address",
+          "This email is already registered, please use a different email.",
         statusCode: 403,
       });
     } else {
-      // Checking whether any other user exists with the same phone number
-      let existingStore = await Store.findOne({
-        storeName,
+
+      // Checking whether any other user exists with the same company
+      let existingCompany = await Company.findOne({
+        companyName,
       });
-      if (existingStore) {
+      if (existingCompany) {
         return next({
-          error: "Store name in use-Please, select unique store name",
+          error: "This Company is already registered, please use a different company.",
           statusCode: 403,
         });
       } else {
-        //   Creating New Company
-        let corporateStore = new Store({
-          storeName,
-        });
 
         // Creating User
         let newUser = new User({
@@ -88,14 +117,40 @@ exports.signUpSeller = async (req, res, next) => {
           lastName,
           email,
           password,
-          companyId: corporateStore._id,
-          companyName: req.body.companyName,
-          role: "seller",
+          role: "buyer",
+          roleType: "corporate"
         });
 
-        await corporateStore.save();
+        //   Creating Corporate Company
+        let corporateCompany = new Company({
+          companyName,
+          companyBased,
+          deliveryAddress,
+          companyRegistered,
+          phoneNumber,
+          ntn,
+          email,
+          userId: newUser._id,
+        });
+
+        // Creating User Profile
+        let profile = new Profile({
+          firstName,
+          lastName,
+          email,
+          password,
+          userId: newUser._id,
+          companyId: corporateCompany._id
+        })
+
         await newUser.save();
-        res.status(200).json({ success: true });
+        await corporateCompany.save();
+        await profile.save();
+
+        res.status(200).json({
+          success: true,
+          msg: "You have been register as a corporate user successfully."
+        });
       }
     }
   } catch (error) {
@@ -106,70 +161,78 @@ exports.signUpSeller = async (req, res, next) => {
   }
 };
 
-exports.signUpCorporate = async (req, res, next) => {
+// @Route http://localhost:4000/api/v1/user/signUp/seller
+// @Method POST
+// @Desc Add new seller-
+exports.signUpSeller = async (req, res, next) => {
   try {
-    let {
-      fullName,
-      storeName,
-      storeBased,
-      deliveryAddress,
-      storeRegistered,
-      contactNumber,
-      ntn,
-      email,
-      password,
-    } = req.body;
+    let { firstName, lastName, email, password, storeName, storeBased, mailingAddress, storeRegistered, phoneNumber } = req.body;
+
     // Checking Validation-
     let errors = checkValidation(req);
     if (errors) {
       return next(errors);
     }
+
     // Cheking for user if user already exists with email-
     const isUser = await User.findOne({ email });
     if (isUser) {
       return next({
         error:
-          "This email is already being used please use a different email address",
+          "This email is already registered, please use a different email.",
         statusCode: 403,
       });
     } else {
-      // Checking whether any other user exists with the same phone number
+
+      // Checking whether any other user exists with the same store
       let existingStore = await Store.findOne({
         storeName,
       });
+
       if (existingStore) {
         return next({
-          error: "Store name in use-Please, select unique store name",
+          error: "This Store is already registered, please use a different store.",
           statusCode: 403,
         });
       } else {
-        //   Creating New Company
-        let corporateStore = new Store({
-          storeName,
-          storeBased,
-          deliveryAddress,
-          storeRegistered,
-          contactNumber,
-          ntn,
-        });
 
         // Creating User
         let newUser = new User({
-          fullName,
+          firstName,
+          lastName,
           email,
-          storeId: corporateStore._id,
-          storeName: req.body.storeName,
           password,
-          role: "buyer",
+          role: "seller",
+          roleType: "vendor"
         });
 
-        await corporateStore.save();
+        //   Creating New Store
+        let vendorStore = new Store({
+          storeName,
+          userId: newUser._id,
+        });
+
+        // Creating User Profile
+        let profile = new Profile({
+          firstName,
+          lastName,
+          email,
+          password,
+          userId: newUser._id,
+          storeId: vendorStore._id
+        })
+
         await newUser.save();
-        res.status(200).json({ success: true });
+        await vendorStore.save();
+        await profile.save();
+
+        res.status(200).json({
+          success: true,
+          msg: "You have been register as a corporate user successfully."
+        });
       }
     }
   } catch (error) {
-    console.log(error);
     next({
       error,
       statusCode: 500,
@@ -177,33 +240,38 @@ exports.signUpCorporate = async (req, res, next) => {
   }
 };
 
-// @Route http://localhost:5000/api/v1/user/login/
+// @Route http://localhost:4000/api/v1/user/login/
 // @Method POST
 // @Desc Login User
-exports.logIn = async (req, res, next) => {
+exports.login = async (req, res, next) => {
   try {
+
+    // Checking Validation-
     let errors = checkValidation(req);
     if (errors) {
       return next(errors);
     }
+
+    // Find the user is exits/
     const isUserExists = await User.findOne({
       email: req.body.email,
     });
 
-    console.log(req.body.email, 'req.body.email');
-
-
+    // User not found returns
     if (!isUserExists) {
       return next({
         error: "Invalid email or password",
         statusCode: 400,
       });
     }
+
+    // Check password valid
     const isCorrectPassword = await isUserExists.verifyPassword(
       req.body.password,
       isUserExists.password
     );
-    console.log(isCorrectPassword, 'isCorrectPassword');
+
+    // Password does not matched
     if (!isCorrectPassword) {
       return next({
         error: "Invalid email or password",
@@ -211,13 +279,14 @@ exports.logIn = async (req, res, next) => {
       });
     }
 
+    // Genrate JWT token for secure the API's
     const token = User.GenerateToken(isUserExists._id);
+
     res.status(200).json({
       token,
       user: isUserExists,
     });
   } catch (error) {
-    console.log(error);
     next({
       error,
       statusCode: 500,
@@ -225,30 +294,42 @@ exports.logIn = async (req, res, next) => {
   }
 };
 
-// @Route http://localhost:5000/api/v1/user/forgetPassword
+// @Route http://localhost:4000/api/v1/user/forgetPassword
 // @Method POST
-// @Desc SEND MAIL TO USER-
+// @Desc SEND MAIL TO USER FOR RESET THE PASSWORD-
 exports.forgotPassword = async (req, res, next) => {
   try {
+
+    // Check Validations
     let errors = checkValidation(req);
     if (errors) {
       return next(errors);
     }
+
+    // User find
     const user = await User.findOne({
       email: req.body.email,
     });
+
+    // User Not Found
     if (!user) {
       res.status(404).json({
         error: "Couldn't find user",
       });
     } else {
+
+      // Genrate The Token for Reset Password
       const token = Math.floor(100000 + Math.random() * 900000);
+
+      // Attached the token code
       user.resetPasswordToken = token;
-      user.resetPasswordDuration = new Date(Date.now() + 420000);
+      // user.resetPasswordDuration = new Date(Date.now() + 420000);
+
       await user.save();
-      // await forgotaPasswordMail(user);
+      await forgotaPasswordMail(user);
       res.status(200).send({
         success: true,
+        msg: "Kindly check your email & click the given link for reset password"
       });
     }
   } catch (error) {
@@ -259,53 +340,60 @@ exports.forgotPassword = async (req, res, next) => {
   }
 };
 
-// @Route http://localhost:5000/api/v1/user/resetPassword/:resetPasswordToken
+// @Route http://localhost:4000/api/v1/user/resetPassword/:resetPasswordToken
 // @Method POST
 // @Desc Reset Password-
 exports.resetPassword = async (req, res, next) => {
   try {
     let { token } = req.params;
     let { newPassword, confirmPassword } = req.body;
+
+    // Check Validation
     let errors = checkValidation(req);
     if (errors) {
       return next(errors);
     }
+
+    // Matched Password 
     if (newPassword !== confirmPassword) {
       return next({
         error: "New password and confirm password must be same",
         statusCode: 400,
       });
     }
+
+    // Find User by rest password token
     let user = await User.findOne({ resetPasswordToken: token });
     if (!user) {
       return res.status(404).json({
-        error: "Couldn't find user",
+        error: "Couldn't find token",
         statusCode: 400,
       });
     } else {
-      if (moment().isBefore(user.resetPasswordDuration)) {
-        let hashedPassword = await generateHashedPassword(newPassword);
-        user.resetPasswordToken = null;
-        user.resetPasswordDuration = null;
-        user.password = hashedPassword;
-        await user.save();
-        res.status(200).json({
-          success: true,
-        });
-      } else {
-        return next({
-          error: "Token expired",
-          statusCode: 400,
-        });
-      }
+
+      // if (moment().isBefore(user.resetPasswordDuration)) {
+      user.resetPasswordToken = null;
+      // user.resetPasswordDuration = null;
+      user.password = newPassword;
+
+      // User data save in DB
+      await user.save();
+      res.status(200).json({
+        success: true,
+        msg: "Your Password has been Changed Successfully"
+      });
+
+      // } else {
+      //   return next({
+      //     error: "Token expired",
+      //     statusCode: 400,
+      //   });
+      // }
     }
   } catch (error) {
-    console.log(error);
     next({
       error,
       statusCode: 500,
     });
   }
 };
-
-// Some new changes

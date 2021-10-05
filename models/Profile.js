@@ -18,17 +18,45 @@ const profileSchema = mongoose.Schema({
         require: true
     },
     dob: {
-        type: date,
+        type: Date,
         require: true
     },
+    defaultAddress: {
+        type: String,
+        require: true
+    },
+    area: {
+        type: String,
+        require: true
+    },
+    city: {
+        type: String,
+        require: true
+    },
+    state: {
+        type: String,
+        require: true
+    },
+    country: {
+        type: String,
+        default: "Pakistan"
+    },
     profilepicture: {
-       type: mongoose.Schema.Types.ObjectId,
+        type: mongoose.Schema.Types.ObjectId,
         ref: "uploads"
     },
-    storeId: {
-       type: mongoose.Schema.Types.ObjectId,
+    userId: {
+        type: mongoose.Schema.Types.ObjectId,
         ref: "users"
     },
+    storeId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "store"
+    },
+    companyId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "company"
+    }
 }, { timestamps: true });
 
 module.exports = uploads = mongoose.model(

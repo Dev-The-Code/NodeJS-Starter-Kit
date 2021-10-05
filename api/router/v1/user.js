@@ -2,11 +2,11 @@ const express = require("express");
 const router = express.Router();
 const userController = require("../../../controllers/user-controller");
 const {
-    signUpValidations,
+    buyerSignUpValidations,
+    corporateSignupValidations,
     loginValidations,
     forgotPasswordValidation,
     resetPasswordValidation,
-    corporateSignupValidations,
 } = require("../../../validations/user-validation");
 const { ensureAuthenticated } = require('../../../config/auth');
 
@@ -26,17 +26,22 @@ const { ensureAuthenticated } = require('../../../config/auth');
 //     res.redirect("/users/login")
 // })
 
-// Individual user Sign UP
-router.route("/signup").post(signUpValidations, userController.signUp);
+// Individual Buyer User Sign UP
+router.route("/signup").post(
+    buyerSignUpValidations,
+    userController.buyerSignUp
+);
 
-// Corporate user Sign UP
+// Corporate User Sign UP
 router.route("/signup/corporate").post(
     corporateSignupValidations,
     userController.signUpCorporate
 );
 
-// User Login
-router.route("/login", ensureAuthenticated).post(loginValidations, userController.logIn);
+// Buyer User Login
+router.route("/login", ensureAuthenticated).post(
+    loginValidations, userController.login
+    );
 
 // User Forget Password
 router.route("/forgetPassword").post(
